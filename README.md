@@ -1,5 +1,5 @@
 
-## Setting up environment(Assuming npm is already installed
+## Setting up environment(Assuming npm is already installed)
   1. `npm install -g gulp` to install Gulp globally.
   2. `npm install` to resolve project dependencies.
 
