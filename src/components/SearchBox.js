@@ -5,35 +5,55 @@ class SearchBox extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      searchTerm: ''
+      searchTerm: '',
+      input: null,
+      searchBox: null
     };
-    this.onInputChange = this.onInputChange.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
-
+    this.search = this.search.bind(this);
+    this.linkSearchBoxWithMap = this.linkSearchBoxWithMap.bind(this);
   }
 
- onInputChange(event) {
-   this.setState({ searchTerm: event.target.value });
-   console.log(event.target.value);
- }
+  componentDidMount() {
+    this.input = document.getElementById('search-box');
+    this.searchBox = new window.google.maps.places.SearchBox(this.input );
 
- onSubmit(event) {
-   this.props.onSearch(this.state.searchTerm); 
- }
+    this.linkSearchBoxWithMap(this.props.map);
+    this.searchBox.addListener('places_changed', this.search);
+  }
 
+  componentWillReceiveProps(nextProps){
+    if(this.props.map !== nextProps.map) {
+        this.linkSearchBoxWithMap(nextProps.map);
+      }
+  }
 
+  linkSearchBoxWithMap(map){
+    if(!map || !this.searchBox ) return;
+    map.controls[window.google.maps.ControlPosition.TOP_LEFT].push(this.input);
+    var that = this;
+    this.searchBox.setBounds(map.getBounds());
+
+    var l =  map.addListener('bounds_changed', function() {
+      that.searchBox.setBounds(map.getBounds());
+      window.google.maps.event.removeListener(l);
+    });
+
+    map.addListener('dragend', function() {
+
+      that.searchBox.setBounds(map.getBounds());
+      var inputValue = document.getElementById("search-box").value;
+      that.props.searchOnMapChange(inputValue);
+    });
+  }
+
+  search() {
+   this.props.onSearch(this.searchBox);
+  }
   render() {
     return (
-      <div className="col-lg-6">
-        <div className="input-group">
-          <input type="text" onChange={this.onInputChange} className="form-control" placeholder="Search for..." />
-          <span className="input-group-btn">
-            <button className="btn btn-default" onClick={this.onSubmit} type="Sumbit">Submit</button>
-          </span>
-        </div>
-      </div>
+          <input id="search-box" placeholder="Search for restaurants, movies, etc.." className="" onChange={this.onInputChange} type="text"/>
     );
-
   }
 }
+
 export default SearchBox;

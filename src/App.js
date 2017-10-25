@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
-import './App.css';
 import SearchBox from './components/SearchBox';
 import SearchResults from './components/SearchResults';
 import MapWithList from './components/MapWithList';
-
-// const API_KEY_PLACES = "AIzaSyCnYKd9fnvBWH3U6qIWdxRVJgWpsm1p7ss";
 
 class App extends Component {
 
@@ -12,31 +9,49 @@ class App extends Component {
     super(props);
     this.state = {
       map: null,
-      markers: null,
-      searchResults: null,
-      activeMarker : null
+      markers: [],
+      searchResults: [],
+      activeMarker : -1,
+      isDragSearch : false
     };
     this.onSearchBarClick = this.onSearchBarClick.bind(this);
+    this.searchOnMapChange = this.searchOnMapChange.bind(this);
     this.getMap = this.getMap.bind(this);
     this.updateActiveIndex = this.updateActiveIndex.bind(this);
   }
 
-  onSearchBarClick(searchTerm) {
-    var service = new window.google.maps.places.PlacesService(this.state.map);
-    service.textSearch({
-      query: searchTerm,
-      radius: '5000',
-      location: {lat: 37.7749, lng: -122.4194},
-     }, callback);
-
-    const that = this;
-
-    function callback(results, status) {
-      if (status ==   window.google.maps.places.PlacesServiceStatus.OK) {
-        console.log(JSON.stringify(results));
-        that.setState({ searchResults: results });
-      }
+  onSearchBarClick(searchBox) {
+    this.setState({ activeMarker: -1 });
+    var results = searchBox.getPlaces();
+    var searchResults = {
+      isDragSearch:false,
+      results: results
     }
+    this.setState({ searchResults });
+  }
+
+  searchOnMapChange(searchTerm){
+    this.setState({ activeMarker: -1 });
+    if(!searchTerm) return;
+
+      var service = new window.google.maps.places.PlacesService(this.state.map);
+      service.textSearch({
+        query: searchTerm,
+        radius: '5000',
+        location: this.state.map.center,
+       }, callback);
+
+      const that = this;
+
+      function callback(results, status) {
+        if (status ===  window.google.maps.places.PlacesServiceStatus.OK) {
+          var searchResults = {
+            results : results,
+            isDragSearch : true
+          }
+          that.setState({ searchResults });
+        }
+      }
   }
 
   getMap(map){
@@ -49,14 +64,14 @@ class App extends Component {
 
   render() {
     return (
-      <div>
-        <SearchBox onSearch={this.onSearchBarClick} />
-        <div className="searchResultsWrapper">
-
-          <SearchResults  results={this.state.searchResults} activeMarker={this.state.activeMarker} updateActiveIndex={this.updateActiveIndex} />
+       <div className="main-container">
+        <div className="map-search-container">
+          <MapWithList isDragSearch={this.state.isDragSearch} getMap={this.getMap}  searchResults={this.state.searchResults} activeIndex={this.state.activeMarker} updateActiveIndex={this.updateActiveIndex} />
+          <SearchBox   searchOnMapChange={this.searchOnMapChange} onSearch={this.onSearchBarClick} map={this.state.map} />
         </div>
-        <MapWithList getMap={this.getMap}  locations={this.state.searchResults} activeIndex={this.state.activeMarker} updateActiveIndex={this.updateActiveIndex} />
-
+        <div className="searchResultsWrapper row">
+          <SearchResults  results={this.state.searchResults.results} activeMarker={this.state.activeMarker} updateActiveIndex={this.updateActiveIndex} />
+        </div>
       </div>
     );
   }
