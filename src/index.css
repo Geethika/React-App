@@ -59,7 +59,8 @@ li .container-fluid{
   height: 100vh;
 }
 ul li.selected-place{
-  background-color: rgb(248, 241, 255);
+  background-color: rgba(87, 67, 90, 0.89);
+  color: white;
 }
 
 .searchResultsWrapper{

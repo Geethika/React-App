@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import SearchBox from './components/SearchBox';
-import SearchResults from './components/SearchResults';
-import MapWithList from './components/MapWithList';
+import React,{ Component } from 'react'
+import SearchBox from './components/SearchBox'
+import SearchResults from './components/SearchResults'
+import MapWithList from './components/MapWithList'
 
 class App extends Component {
 
@@ -67,7 +67,7 @@ class App extends Component {
        <div className="main-container">
         <div className="map-search-container">
           <MapWithList isDragSearch={this.state.isDragSearch} getMap={this.getMap}  searchResults={this.state.searchResults} activeIndex={this.state.activeMarker} updateActiveIndex={this.updateActiveIndex} />
-          <SearchBox   searchOnMapChange={this.searchOnMapChange} onSearch={this.onSearchBarClick} map={this.state.map} />
+          <SearchBox searchOnMapChange={this.searchOnMapChange} onSearch={this.onSearchBarClick} map={this.state.map} />
         </div>
         <div className="searchResultsWrapper row">
           <SearchResults  results={this.state.searchResults.results} activeMarker={this.state.activeMarker} updateActiveIndex={this.updateActiveIndex} />
